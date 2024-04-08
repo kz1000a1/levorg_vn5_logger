@@ -1,8 +1,8 @@
 /*
-  CAN bus data logger for MAZDA MX-5
+  CAN bus data logger for SUBARU Levorg
 */
 
-#include "mazda_mx5_nc.h"
+#include "subaru_levorg_vn5.h"
 #include "driver/twai.h"
 
 // Pins used to connect to CAN bus transceiver:
