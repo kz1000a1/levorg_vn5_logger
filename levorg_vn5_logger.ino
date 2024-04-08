@@ -31,7 +31,7 @@ int16_t bytesToInt(uint8_t raw[], int shift, int size) {
     // Serial.printf("result=%04X << %d = ",result, sizeof(byte) * 8);
     result = result << (sizeof raw[0] * 8);
     // Serial.printf("%d\n",result);
-    for (int j = 0; j < sizeof(byte) * 8; j++) {
+    for (int j = 0; j < sizeof raw[0] * 8; j++) {
       // Serial.printf("%04X & %04X = %d += %04X,result=%04X\n", raw[i + shift], 1 << j,raw[i + shift] & (1 << j),result);
       // if(raw[i + shift] & (1 << j))(result += 1 << j);
       result += raw[i + shift] & (1 << j);
@@ -52,7 +52,7 @@ uint16_t bytesToUint(uint8_t raw[], int shift, int size) {
     // Serial.printf("result=%04X << %d = ",result, sizeof(byte) * 8);
     result = result << (sizeof raw[0] * 8);
     // Serial.printf("%d\n",result);
-    for (int j = 0; j < sizeof(byte) * 8; j++) {
+    for (int j = 0; j < sizeof raw[0] * 8; j++) {
       // Serial.printf("%04X & %04X = %d += %04X,result=%04X\n", raw[i + shift], 1 << j,raw[i + shift] & (1 << j),result);
       // if(raw[i + shift] & (1 << j))(result += 1 << j);
       result += raw[i + shift] & (1 << j);
@@ -98,11 +98,11 @@ int16_t bytesToIntLe(uint8_t raw[], int shift, int size) {
 
   int16_t result = 0;
 
-  for (int i = 0; i < size; i++) {
+  for (int i = size - 1; 0 <= i; i--) {
     // Serial.printf("result=%04X << %d = ",result, sizeof(byte) * 8);
     result = result << (sizeof raw[0] * 8);
     // Serial.printf("%d\n",result);
-    for (int j = 0; j < sizeof(byte) * 8; j++) {
+    for (int j = 0; j < sizeof raw[0] * 8; j++) {
       // Serial.printf("%04X & %04X = %d += %04X,result=%04X\n", raw[i + shift], 1 << j,raw[i + shift] & (1 << j),result);
       // if(raw[i + shift] & (1 << j))(result += 1 << j);
       result += raw[i + shift] & (1 << j);
@@ -115,6 +115,7 @@ int16_t bytesToIntLe(uint8_t raw[], int shift, int size) {
   // return &raw[shift];
 }
 
+/*
 uint16_t bitsToUintLe(uint8_t raw[], int shift, int size) {
 
   uint16_t result = 0;
@@ -128,6 +129,7 @@ uint16_t bitsToUintLe(uint8_t raw[], int shift, int size) {
 
   // return &raw[shift];
 }
+*/
 
 bool if_can_message_receive_is_pendig() {
 
@@ -147,7 +149,8 @@ bool if_can_message_receive_is_pendig() {
 
 void subaruLevorgEngineSpeed(twai_message_t* rx_frame) {
 
-  EngineRPM = bitsToUIntLe(rx_frame->data, 16, 14);
+  // EngineRPM = bitsToUIntLe(rx_frame->data, 16, 14);
+  EngineRPM = (rx_frame->data[2] >> 4) + (rx_frame->data[3] << 4) + ((rx_frame->data[4] & 0x03) << 4);
   // Serial.printf("%5.2f rpm\n",EngineRPM);
   AcceleratorPosition = bytesToUint(rx_frame->data, 4, 1) / 2.55;
   // Serial.printf("Accel = %3.2f \%\n",AcceleratorPosition);
