@@ -1,231 +1,164 @@
 //-------------------------------------------------------------------------------------//
-// MAZDA 3rd GEN MX-5(mk3.5) SPEC
-// https://www2.mazda.co.jp/cars/roadster/spec/pdf/roadster_specification.pdf
+// SUBARU 2nd GEN Levorg(VN5) SPEC
+// https://scdam.subaru.jp/20230925/20230925104506levorg_specifications.pdf
 //-------------------------------------------------------------------------------------//
 
-#define TYRE_OUTER_DIAMETER_16            191.9796    // 205/50R16       
-#define TYRE_OUTER_DIAMETER_17            193.5182    // 205/45R17
-#define WHEEL_BASE                           2.330
-#define TURNING_CIRCLE                       4.700
+#define TYRE_OUTER_DIAMETER_17            2031.9821    // 215/50R17       
+#define TYRE_OUTER_DIAMETER_18            2072.5087    // 225/45R18
+#define WHEEL_BASE                           2.670
+#define TURNING_CIRCLE                       5.500
 #define MAX_STEERING_ANGLE                   (asin(WHEEL_BASE / TURNING_CIRCLE) * 180 / M_PI)
-#define REV_LIMIT                             7500
+#define REV_LIMIT                             6000
 #define STEERING_LOCK_TO_LOCK                  2.8
 #define STEERING_MAX                           (STEERING_LOCK_TO_LOCK * 360 / 2)
 #define STEERING_MIN                           (- STEERING_MAX)
 #define SPEED_WARNING                           80
 #define SPEED_WARNING_ON                      true
 #define SPEED_WARNING_OFF                    false
-#define GEAR_RATIO_1                         3.815
-#define GEAR_RATIO_2                         2.260
-#define GEAR_RATIO_3                         1.640
-#define GEAR_RATIO_4                         1.177
-#define GEAR_RATIO_5                         1.000
-#define GEAR_RATIO_6                         0.787
-#define FINAL_RATIO                          4.100
+#define GEAR_RATIO_1                         4.065
+#define GEAR_RATIO_2                         2.600
+#define GEAR_RATIO_3                         1.827
+#define GEAR_RATIO_4                         1.377
+#define GEAR_RATIO_5                         1.061
+#define GEAR_RATIO_6                         0.836
+#define GEAR_RATIO_7                         0.667
+#define GEAR_RATIO_8                         0.559
+#define FINAL_RATIO                          3.900
+
+#define CAN_ID_TRANSMISSION                  0x048
 
 //-------------------------------------------------------------------------------------//
 // CAN IDs
-// https://github.com/timurrrr/RaceChronoDiyBleDevice/blob/master/can_db/mazda_mx5_nc.md
+// https://github.com/timurrrr/ft86/blob/main/can_bus/gen2.md
 //-------------------------------------------------------------------------------------//
-#define CAN_ID_STEERLING                  0x081
 // 
+#define CAN_ID_ENGINE_SPEED                  0x040
+// CAN ID 0x40 (64)
 // Update frequency: 100 times per second.
-// 
-// `0x081` contain data related to steering angle. This CAN ID is available only in
-// cars with DSC module, so all cars from 2007 onwards.
-// Only 4 bytes long.
-// 
-// Byte | Meaning
-// ---- | -------
-// 0 | unidentified
-// 1 | on/off (EF/6F or 11101111/01101111)
-// 2 & 3| signed values for the steering angle
-// 
-// 
-// Channel name | Equation | Notes
-// ------------ | -------- | -----
-// Steering angle | `bytesToInt(raw, 2, 2)` | positive values are from centered position (0) to right, negative otherwise
-// 
-#define CAN_ID_BRAKE 0x085
-// 
+//
+// Example values:
+// 0x 5D 0B C9 82 00 00 00 C7 (parked)
+// 0x 10 0D FA 06 00 00 00 C3 (moving slowly)
+//
+// Channel name	Equation	Notes
+// Engine RPM	bitsToUIntLe(raw, 16, 14)	
+// Accelerator position	E / 2.55	
+// Accelerator position	F / 2.55	Seems to always have the same value as E
+// Accelerator position	G / 2.55	Seems to always have the same value as E
+// ???	H & 0xC0	0xC0 when off the accelerator pedal, 0x00 otherwise.
+//
+// CAN ID 0x41 (65)
 // Update frequency: 100 times per second.
-// 
-// `0x085` contain data related to braking. This CAN ID is available only in
-// cars with DSC module, so all cars from 2007 onwards.
-// 
-// Byte | Meaning
-// ---- | -------
-// 0 & 1 | together with byte 1 represent the pressure of the braking system
-// 2 | brake siwtch ON/OFF, information contained in bit 0 (MSB, from left)
-// 3 | Not changing
-// 4 | Not changing
-// 5 | Not changing
-// 6 | Not changing
-// 7 | Not changing
-// 
-// Channel name | Equation | Notes
-// ------------ | -------- | -----
-// Brake pressure | `(3.4518689053*bytesToInt(raw, 0, 2)-327.27)/1000.00` | multipliers are obtained from data from Leisurehound user on miata.net, may be wrong. Unit is kPa
-// Brake percentage | `min(0.2*(bytesToInt(raw, 0, 2)-102),100)` | this is an alternative to get brake percentage. When not pressed the value is 102, after braking and releasing it goes briefly down to 99 so you may see slightly negative percentage.
-// Digital | `bitsToUint(raw,17,1)/2` | 0-1 value
-// 
-#define CAN_ID_ACCEL 0x090
-// 
-// Update frequency: 100 times per second.
-// 
-// `0x090` WIP. Probably related to accelerations. This CAN ID is available only in
-// cars with DSC module, so all cars from 2007 onwards.
-// 
-// Byte | Meaning
-// ---- | -------
-// 0 | WIP
-// 1 | WIP
-// 2 | WIP
-// 3 | WIP
-// 4 | WIP
-// 5 | WIP
-// 6 | WIP
-// 7 | WIP
-// 
-// Channel name | Equation | Notes
-// ------------ | -------- | -----
-// ... | ... | ...
-// 
-#define CAN_ID_TORQUE 0x200
-// 
-// Update frequency: 100 times per second.
-// 
-// `0x200` WIP. Probably related to torque. Byte 7 contain
-// Throttle Valve Position
-// 
-// Byte | Meaning
-// ---- | -------
-// 0 | WIP
-// 1 | WIP
-// 2 | WIP
-// 3 | WIP
-// 4 | WIP
-// 5 | WIP
-// 6 | WIP
-// 7 | Throttle Valve Position (%)
-// 
-// Channel name | Equation | Notes
-// ------------ | -------- | -----
-// Throttle Position | `bytestouint(raw,7,1)*100/255.00` | Scale may need adjustment, doesn't take into account the offset for idle. Same value available in CAN ID 0x215 byte 6
-// 
-#define CAN_ID_ENGINE_SPEED 0x201
-// 
-// Update frequency: 100 times per second.
-// 
-// `0x201` This CAN ID is related to engine speed, vehicle speed
-// and accelerator position.
-// 
-// Byte | Meaning
-// ---- | -------
-// 0 | With byte 1 represent engine speed
-// 1 | With byte 0 represent engine speed
-// 2 & 3| WIP: follows RPM
-// 4 & 5 | represent vehicle speed
-// 6 | Accelerator pedal position (%)
-// 7 | Always FF
-// 
-// Channel name | Equation | Notes
-// ------------ | -------- | -----
-// Engine RPM | `bytestouint(raw,0,2)/4.00` | 
-// Speed | `((bytestoint(raw,4,2)/100.00)-100)/3.6` | Raw speed data is given in km/h with a 100 km/h offset. The "3.6" at the end of the equation is needed to switch to m/s that is the unit used internally for calculation by RaceChrono. In the calculation RaceChrono will then multiply automatically for the correct value to transform the m/s to your choice of units (i.e. km/h or mph).
-// Accelerator Position | `bytestoint(raw,6,1)*2.00` | This is a percentage, increments of 0.5%
-// 
-// ## CAN ID 0x215
-// 
-// Update frequency: 100 times per second.
-// 
-// `0x215` WIP. Mostly related to fault codes but
-// byte 6 contain Throttle Valve Position
-// 
-// Byte | Meaning
-// ---- | -------
-// 0 | WIP
-// 1 | WIP
-// 2 | WIP
-// 3 | WIP
-// 4 | WIP
-// 5 | WIP
-// 6 | Throttle Valve Position (%)
-// 7 | WIP
-// 
-// Channel name | Equation | Notes
-// ------------ | -------- | -----
-// Throttle Position | `bytestouint(raw,6,1)*100/255.00` | Scale may need adjustment, doesn't take into account the offset for idle. Same value available in CAN ID 0x200 byte 7
-// 
-#define CAN_ID_TRANSMISSION 0x231
-// 
-// Update frequency: 40 times per second.
-// 
-// `0x231` Is related to transmission, probably has
-// more significative data for AT cars. On MT cars
-// only interesting bit is the clutch switch
-// 
-// Byte | Meaning
-// ---- | -------
-// 0 | Always FF (on MT)
-// 1 | bit 7 (MSB, counting from left) clutch switch; bit 6 (MSB) may be related to neutral/in gear?
-// 2 | Always FF (on MT)
-// 3 | Always FF (on MT)
-// 4 | Always 00 (on MT)
-// 5 | Always 00 (on MT)
-// 6 | Always 00 (on MT)
-// 7 | Always 00 (on MT)
-// 
-// Channel name | Equation | Notes
-// ------------ | -------- | -----
-// Digital | `(bitstouint(raw,15,1)-4)/2` | 0 - 1 value
-// 
-// 
-#define CAN_ID_ENGINE 0x240
-// 
+//
+// Example values:
+// 0x C9 43 96 A6 7B 27 65 02 (parked)
+// 0x 94 4E 44 A7 78 27 7B 00 (moving slowly)
+//
+// Channel name	Equation	Notes
+// A/C fan clutch	H & 0x2	2 is engaged, 0 is disengaged
+//
+// CAN ID 0x118 (280)
+// Update frequency: 50 times per second.
+//
+// Example values:
+// 0x 7E 0F 00 07 00 4F 00 00 (parked)
+// 0x 8C 02 00 21 00 50 00 00 (moving slowly)
+//
+#define CAN_ID_STEERLING                  0x138
+// CAN ID 0x138 (312)
+// Update frequency: 50 times per second.
+//
+// Example values:
+// 0x 28 0C DD 06 00 00 00 00 (parked)
+// 0x 90 0D 13 FA 3F 00 00 00 (moving slowly)
+//
+// Channel name	Equation	Notes
+// Steering angle	bytesToIntLe(raw, 2, 2) * -0.1	Positive value = turning left. You can add a - if you prefer it the other way around.
+// Yaw rate	bytesToIntLe(raw, 4, 2) * -0.2725	Calibrated against the gyroscope in RaceBox Mini. Gen1 used 0.286478897 instead.
+//
+#define CAN_ID_BRAKE                  0x139
+// CAN ID 0x139 (313)
+// Update frequency: 50 times per second.
+//
+// Example values:
+// 0x 72 5A 00 E0 08 00 DA 1C (parked)
+// 0x 62 5B FC E0 08 00 CD 1C (moving slowly)
+//
+// Channel name	Equation	Notes
+// Speed	bitsToUIntLe(raw, 16, 13) * 0.015694	You may want to check the multiplier against an external GPS device, especially if running larger/smaller diameter tires
+// Brake lights switch	(E & 0x4)	4 is on, 0 is off
+// Brake pressure	F * 128	Coefficient taken from 1st gen cars, but might need to be verified.
+//
+// CAN ID 0x13A (314)
+// Available on C_CAN, which can be found at the power steering unit. This channel is not available on B_CAN which connects to the ASC unit.
+//
+// Channel name	Equation	Notes
+// Wheel speed FL	bitsToUIntLe(raw, 12, 13) * 0.015694	Use same multiplier as for speed in 0x139
+// Wheel speed FR	bitsToUIntLe(raw, 25, 13) * 0.015694	Use same multiplier as for speed in 0x139
+// Wheel speed RL	bitsToUIntLe(raw, 38, 13) * 0.015694	Use same multiplier as for speed in 0x139
+// Wheel speed RR	bitsToUIntLe(raw, 51, 13) * 0.015694	Use same multiplier as for speed in 0x139
+//
+// CAN ID 0x13B (315)
+// Update frequency: 50 times per second.
+//
+// Example values:
+// 0x 47 0F 00 00 FF FF FF FF (parked)
+// 0x 37 02 00 00 FF FF FE FD (moving slowly)
+//
+// Channel name	Equation	Notes
+// Lateral acceleration	bytesToIntLe(raw, 6, 1) * 0.2	
+// Longitudinal acceleration	bytesToIntLe(raw, 7, 1) * -0.1	
+// Combined acceleration	sqrt(pow2(bytesToIntLe(raw, 6, 1) * 0.2) + pow2(bytesToIntLe(raw, 7, 1) * 0.1))	
+//
+// CAN ID 0x13C (316)
+// Update frequency: 50 times per second.
+//
+// Example values:
+// 0x D4 0F 0E 38 02 00 40 00 (parked)
+// 0x 12 0E 00 0B 0E 42 6C 00 (moving slowly)
+//
+// CAN ID 0x143 (323)
+// Update frequency: 50 times per second.
+//
+// Example values:
+// 0x 51 0D 00 00 00 00 00 00 (parked)
+// 0x 5C 07 00 10 01 00 00 00 (moving slowly)
+//
+// Channel name	Equation	Notes
+// Speed	bitsToUIntLe(raw, 24, 14) * 0.015694	You may want to check the multiplier against an external GPS device, especially if running larger/smaller diameter tires
+//
+// CAN ID 0x146 (326)
+// Update frequency: 50 times per second.
+//
+// Example values:
+// 0x 7C 1B CE 42 09 01 00 00 (parked)
+// 0x 19 11 68 48 11 00 00 00 (moving slowly)
+//
+// CAN ID 0x241 (577)
+// Update frequency: 20 times per second.
+//
+// Channel name	Equation	Notes
+// Clutch position (%)	(F & 0x80) / 1.28	100 is "clutch pedal depressed", 0 is "clutch pedal released"
+// Gear	bitsToUIntLe(raw, 35, 3)	0 for N, 1—6 for gears 1–6
+//
+// CAN ID 0x2D2 (722)
+// Update frequency: 33.3 times per second.
+//
+// Example values:
+// 0x 3A 06 40 00 20 00 00 00 (parked)
+// 0x 3E 02 48 00 20 00 00 00 (moving slowly)
+//
+#define CAN_ID_ENGINE_TEMPERATURE                  0x345
+// CAN ID 0x345 (837)
 // Update frequency: 10 times per second.
-// 
-// `0x240` Contains engine related data such as
-// cooling water temperature, air intake temperature
-// spark angle, calculated load, throttle valve position
-// only interesting bit is the clutch switch
-// 
-// Byte | Meaning
-// ---- | -------
-// 0 | Calculated Load (%)
-// 1 | Engine Coolant Temperature (属C)
-// 2 | WIP: seems related to ignition timing (deg)
-// 3 | Throttle Valve Position (%)
-// 4 | Intake Air Temperature (属C)
-// 5 | Always 00
-// 6 | Always 00
-// 7 | Always 00 (faults?)
-// 
-// Channel name | Equation | Notes
-// ------------ | -------- | -----
-// Percentage | `100*(bytestouint(raw,0,1)/255.00` | can't find Engine Load on RaceChrono list of channels
-// Coolant temperature | `bytestouint(raw,1,1)-40` | RaceChrono does calculation in 属C then converts to your unit of choice. Same data availble in byte 0 of ID 420
-// Throttle position | `100*bytestouint(raw,1,1)/255` | Scale may need adjustment. This ID should refer to absolute opening value, i.e. taking into account the opening at idle. Still, the value at idle for my measurements seems too high (11%...)
-// Ignition advance
-// Intake temperature | `bytestouint(raw,4,1)-40` | RaceChrono does calculation in 属C then converts to your unit of choice
-// 
-#define CAN_ID_WHEEL_SPEED 0x4b0
-// 
-// Update frequency: 100 times per second.
-// 
-// `0x4b0` is dedicated only to wheel speed representation
-// 
-// Byte | Meaning
-// ---- | -------
-// 0 & 1 | Front Left Wheel Speed
-// 2 & 3 | Front Right Wheel Speed
-// 4 & 5 | Rear Left Wheel Speed
-// 6 & 7 | Rear Right Wheel Speed
-// 
-// Channel name | Equation | Notes
-// ------------ | -------- | -----
-// Vehicle Speed Front Left | `((bytestoint(raw,0,2)/100.00)-100)/3.6` | Raw speed data is given in km/h with a 100 km/h offset. The "3.6" at the end of the equation is needed to switch to m/s that is the unit used internally for calculation by RaceChrono. In the calculation RaceChrono will then multiply automatically for the correct value to transform the m/s to your choice of units (i.e. km/h or mph).
-// Vehicle Speed Front Right | `((bytestoint(raw,2,2)/100.00)-100)/3.6` |
-// Vehicle Speed Rear Left | `((bytestoint(raw,4,2)/100.00)-100)/3.6` |
-// Vehicle Speed Rear Right | `((bytestoint(raw,6,2)/100.00)-100)/3.6` |
-
+//
+// Channel name	Equation	Notes
+// Engine oil temperature	D - 40	
+// Coolant temperature	E - 40
+//
+#define CAN_ID_AIR_TEMPERATURE                  0x390
+// CAN ID 0x390 (912)
+// Update frequency: 10 times per second.
+//
+// Channel name	Equation	Notes
+// Air Temperature	E / 2 - 40	
