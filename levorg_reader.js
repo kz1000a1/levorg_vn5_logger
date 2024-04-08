@@ -1,13 +1,13 @@
-/// MAZDA MX-5 3rd gen log リーダ ////////////////////////////////////////////////////////
+/// SUBARU Levorg 2nd gen log リーダ ////////////////////////////////////////////////////////
 
 LogReaderInfo.push({
-	Caption:	"Mazda Mx-5 (*.txt)",
+	Caption:	"Subaru Levorg (*.txt)",
 	Filter:		"*.txt;*.txt.gz",
-	ReaderFunc:	"ReadMx5Log",
-	Priority:	0x4d582d35,
+	ReaderFunc:	"ReadLevorgLog",
+	Priority:	0x564e3543,
 });
 
-function ReadMx5Log( Files ){
+function ReadLevorgLog( Files ){
 
 	Log.Time	= [];
 	Log.Speed	= [];
