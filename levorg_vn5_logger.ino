@@ -19,11 +19,9 @@ static bool driver_installed = false;
 static float EngineRPM = 0;
 static float Speed = 0;
 static float AcceleratorPosition = 0;
-static char ShiftPosition = 'N';
+static char ShiftPosition = 'P';
 static int16_t SteeringAngle = 0;
 static float BrakePercentage = 0;
-static uint8_t clutch = 0;
-static uint8_t neutral = 0;
 
 int16_t bytesToInt(uint8_t raw[], int shift, int size) {
 
@@ -96,6 +94,41 @@ uint16_t bitToUint(uint8_t raw[], int shift) {
   return result;
 }
 
+int16_t bytesToIntLe(uint8_t raw[], int shift, int size) {
+
+  int16_t result = 0;
+
+  for (int i = 0; i < size; i++) {
+    // Serial.printf("result=%04X << %d = ",result, sizeof(byte) * 8);
+    result = result << (sizeof raw[0] * 8);
+    // Serial.printf("%d\n",result);
+    for (int j = 0; j < sizeof(byte) * 8; j++) {
+      // Serial.printf("%04X & %04X = %d += %04X,result=%04X\n", raw[i + shift], 1 << j,raw[i + shift] & (1 << j),result);
+      // if(raw[i + shift] & (1 << j))(result += 1 << j);
+      result += raw[i + shift] & (1 << j);
+      //Serial.printf("i=%d,j=%d,raw[%d]=0x%02X,result=0x%04X\n",i,j,i+shift,raw[i+shift],result);
+    }
+  }
+
+  return result;
+
+  // return &raw[shift];
+}
+
+uint16_t bitsToUintLe(uint8_t raw[], int shift, int size) {
+
+  uint16_t result = 0;
+
+  for (int i = shift; i < shift + size; i++) {
+    result = result << 1;
+    result += bitToUint(raw, i);
+  }
+
+  return result;
+
+  // return &raw[shift];
+}
+
 bool if_can_message_receive_is_pendig() {
 
   uint32_t alerts_triggered;
@@ -112,74 +145,40 @@ bool if_can_message_receive_is_pendig() {
   }
 }
 
-void mazdaMx5EngineSpeed(twai_message_t* rx_frame) {
-  static float GearRatio;
+void subaruLevorgEngineSpeed(twai_message_t* rx_frame) {
 
-  EngineRPM = bytesToUint(rx_frame->data, 0, 2) / 4.00;
+  EngineRPM = bitsToUIntLe(rx_frame->data, 16, 14);
   // Serial.printf("%5.2f rpm\n",EngineRPM);
-  Speed = (bytesToUint(rx_frame->data, 4, 2) / 100.00) - 100;
-  // Serial.printf("%3.2f km/h\n",Speed);
-  // Raw speed data is given in km/h with a 100 km/h offset.
-  AcceleratorPosition = bytesToUint(rx_frame->data, 6, 1) / 2.00;
+  AcceleratorPosition = bytesToUint(rx_frame->data, 4, 1) / 2.55;
   // Serial.printf("Accel = %3.2f \%\n",AcceleratorPosition);
-  // This is a percentage, increments of 0.5%
-  if ((int)Speed != 0 && (int)EngineRPM != 0) {
-    // Serial.printf("%5.2f rpm, %3.2f km/h\n",EngineRPM,Speed);
-    GearRatio = (EngineRPM * 60) / FINAL_RATIO * (TYRE_OUTER_DIAMETER_16 / 100000) / Speed;
-  } else {
-    GearRatio = 0;
-  }
-
-  if (clutch) {
-    ShiftPosition = 'C';
-  } else {
-    if (neutral) {
-      ShiftPosition = 'N';
-    } else {
-      if (GearRatio == 0) {
-        ShiftPosition = 'N';
-      } else if (GearRatio < (GEAR_RATIO_6 + GEAR_RATIO_5) / 2) {
-        ShiftPosition = '6';
-      } else if (GearRatio < (GEAR_RATIO_5 + GEAR_RATIO_4) / 2) {
-        ShiftPosition = '5';
-      } else if (GearRatio < (GEAR_RATIO_4 + GEAR_RATIO_3) / 2) {
-        ShiftPosition = '4';
-      } else if (GearRatio < (GEAR_RATIO_3 + GEAR_RATIO_2) / 2) {
-        ShiftPosition = '3';
-      } else if (GearRatio < (GEAR_RATIO_2 + GEAR_RATIO_1) / 2) {
-        ShiftPosition = '2';
-      } else {
-        ShiftPosition = '1';
-      }
-    }
-  }
 }
 
-void mazdaMx5Transmission(twai_message_t* rx_frame) {
-
+void subaruLevorgTransmission(twai_message_t* rx_frame) {
+/*
   clutch = bitToUint(rx_frame->data, 15);
   // Serial.printf("clutch = %d\n", clutch);
   neutral = bitToUint(rx_frame->data, 14);
   // Serial.printf("neutral = %d\n", neutral);
+*/
 }
 
-void mazdaMx5Steering(twai_message_t* rx_frame) {
+void subaruLevorgSteering(twai_message_t* rx_frame) {
 
-  SteeringAngle = bytesToInt(rx_frame->data, 2, 2);
+  SteeringAngle = bytesToIntLe(rx_frame->data, 2, 2) * -0.1;
   // Serial.printf("Steering %-d\n",SteeringAngle);
 }
 
-void mazdaMx5Brake(twai_message_t* rx_frame) {
+void subaruLevorgBrake(twai_message_t* rx_frame) {
   // BrakePressure = (3.4518689053 * bytesToInt(rxBuf, 0, 2) - 327.27) / 1000.00;
   // BrakePercentage = min(0.2 * (bytesToInt(rxBuf, 0, 2) - 102), 100);
-  BrakePercentage = 0.2 * (bytesToInt(rx_frame->data, 0, 2) - 102);
+  BrakePercentage = bytesToUint(rx_frame->data, 5, 1) / 0.7;
   if (100 < BrakePercentage) {
     BrakePercentage = 100;
   }
   // Serial.printf("Brake = %3.2f \%\n",BrakePercentage);
 }
 
-void mazdaMx5OutputCsv() {
+void subaruLevorgOutputCsv() {
   // Serial.println("mazdaMx5OutputCsv()");
   Serial.printf(", %3.1f, %4.1f, %c, %3.1f, %3.1f, %-2.1f\n", Speed, EngineRPM, ShiftPosition, AcceleratorPosition, BrakePercentage, SteeringAngle * MAX_STEERING_ANGLE / STEERING_MAX);
 }
@@ -234,19 +233,19 @@ void loop() {
 
       switch (rx_frame.identifier) {
         case CAN_ID_ENGINE_SPEED:
-          mazdaMx5EngineSpeed(&rx_frame);
+          subaruLevorgEngineSpeed(&rx_frame);
           break;
         case CAN_ID_TRANSMISSION:
-          mazdaMx5Transmission(&rx_frame);
+          subaruLevorgTransmission(&rx_frame);
           break;
         case CAN_ID_STEERLING:
-          mazdaMx5Steering(&rx_frame);
+          subaruLevorgSteering(&rx_frame);
           break;
         case CAN_ID_BRAKE:
-          mazdaMx5Brake(&rx_frame);
+          subaruLevorgBrake(&rx_frame);
           break;
-        case CAN_ID_ENGINE:
-          mazdaMx5OutputCsv();
+        case #define CAN_ID_ENGINE_TEMPERATURE:
+          subaruLevorgOutputCsv();
           break;
           // default:
           // Serial.printf("Unexpected can frame received. rx_frame.identifier=%3x\n", rx_frame.identifier);
