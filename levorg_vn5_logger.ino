@@ -247,7 +247,7 @@ void loop() {
         case CAN_ID_BRAKE:
           subaruLevorgBrake(&rx_frame);
           break;
-        case #define CAN_ID_ENGINE_TEMPERATURE:
+        case CAN_ID_ENGINE_TEMPERATURE:
           subaruLevorgOutputCsv();
           break;
           // default:
