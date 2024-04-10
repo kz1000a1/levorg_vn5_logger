@@ -19,7 +19,7 @@ static bool driver_installed = false;
 static float EngineRPM = 0;
 static float Speed = 0;
 static float AcceleratorPosition = 0;
-static char ShiftPosition = 'P';
+static uint8_t ShiftPosition = 4;
 static int16_t SteeringAngle = 0;
 static float BrakePercentage = 0;
 
@@ -158,22 +158,7 @@ void subaruLevorgEngineSpeed(twai_message_t* rx_frame) {
 
 void subaruLevorgTransmission(twai_message_t* rx_frame) {
 
-  switch (rx_frame->data[3] & 0x07) {
-    case 0x04:
-      ShiftPosition = 'P';
-      break;
-    case 0x03:
-      ShiftPosition = 'R';
-      break;
-    case 0x02:
-      ShiftPosition = 'N';
-      break;
-    case 0x01:
-      ShiftPosition = 'D';
-      break;
-    // default:
-      // Serial.printf("Unexpected can frame received. rx_frame.identifier=%3x\n", rx_frame.identifier);
-  }
+  ShiftPosition = rx_frame->data[3] & 0x07;
   
 }
 
