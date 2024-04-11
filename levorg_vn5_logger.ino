@@ -170,7 +170,7 @@ void subaruLevorgSteering(twai_message_t* rx_frame) {
 
 void subaruLevorgBrake(twai_message_t* rx_frame) {
   // Speed = bitsToUIntLe(rx_frame->data, 16, 13) * 0.015694;
-  Speed = (rx_frame->data[2] + ((rx_frame->data[3] & 0x1f) << 8)) * 0.016;
+  Speed = (rx_frame->data[2] + ((rx_frame->data[3] & 0x1f) << 8)) * 0.05625;
   // BrakePressure = (3.4518689053 * bytesToInt(rxBuf, 0, 2) - 327.27) / 1000.00;
   // BrakePercentage = min(0.2 * (bytesToInt(rxBuf, 0, 2) - 102), 100);
   BrakePercentage = bytesToUint(rx_frame->data, 5, 1) / 0.7;
@@ -182,7 +182,7 @@ void subaruLevorgBrake(twai_message_t* rx_frame) {
 
 void subaruLevorgOutputCsv() {
   // Serial.println("mazdaMx5OutputCsv()");
-  Serial.printf(", %3.1f, %4.1f, %c, %3.1f, %3.1f, %-2.1f\n", Speed, EngineRPM, ShiftPosition, AcceleratorPosition, BrakePercentage, SteeringAngle * MAX_STEERING_ANGLE / STEERING_MAX);
+  Serial.printf(", %3.1f, %4.1f, %d, %3.1f, %3.1f, %-2.1f\n", Speed, EngineRPM, ShiftPosition, AcceleratorPosition, BrakePercentage, SteeringAngle * MAX_STEERING_ANGLE / STEERING_MAX);
 }
 
 void setup() {
