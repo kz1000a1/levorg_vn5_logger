@@ -136,9 +136,9 @@ function Initialize(){
 	};
 
 	BrakeMeterParam = {
-		X:			Vsd.Width  * 7 / 8,
-		Y:			Vsd.Height - MeterOffsetY,
-		R:			MeterR,
+		X:		Vsd.Width  * 7 / 8,
+		Y:		Vsd.Height - MeterOffsetY,
+		R:		MeterR,
 		Line1Len:	MeterR * 0.1,
 		Line1Width:	5,
 		Line1Color:	0xFFFFFF,
@@ -157,9 +157,9 @@ function Initialize(){
 	};
 	
 	AccelMeterParam = {
-		X:			Vsd.Width  * 7 / 8,
-		Y:			Vsd.Height - MeterOffsetY,
-		R:			MeterR,
+		X:		Vsd.Width  * 7 / 8,
+		Y:		Vsd.Height - MeterOffsetY,
+		R:		MeterR,
 		Line1Len:	MeterR * 0.1,
 		Line1Width:	5,
 		Line1Color:	0xFFFFFF,
@@ -190,7 +190,6 @@ function Draw(){
 	Vsd.DrawRoundMeterScale( AngleMeterParam );
 
 	// アングルメーター針
-
 	Vsd.DrawNeedle(
 		AngleMeterParam.X, AngleMeterParam.Y, MeterR, MeterR * 0.93,
 		MeterMin, MeterMax, (MaxAngle - Log.Angle) / (MaxAngle * 2), 0xFF0000, 10
@@ -232,7 +231,7 @@ function Draw(){
 	Vsd.DrawTextAlign(
 		SpeedMeterParam.X, SpeedMeterParam.Y - MeterR * 0.5,
 		ALIGN_HCENTER | ALIGN_TOP,
-		"km/h", FontS, 0xFFFFFF
+		"KM/H", FontS, 0xFFFFFF
 	);
 
 	//////////     タコメーター     //////////
