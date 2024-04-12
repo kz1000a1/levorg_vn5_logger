@@ -192,14 +192,14 @@ function Draw(){
 	// アングルメーター針
 	Vsd.DrawNeedle(
 		AngleMeterParam.X, AngleMeterParam.Y, MeterR, MeterR * 0.93,
-		MeterMin, MeterMax, (MaxAngle - Log.Angle) / (MaxAngle * 2), 0xFF0000, 10
+		MeterMin, MeterMax, (MaxAngle + Log.Angle) / (MaxAngle * 2), 0xFF0000, 10
 	);
 
 	// アングル数値表示
 	Vsd.DrawTextAlign(
 		AngleMeterParam.X, AngleMeterParam.Y , 
 		ALIGN_HCENTER | ALIGN_VCENTER,
-		- (~~Log.Angle), FontL, 0xFFFFFF
+		~~Log.Angle, FontL, 0xFFFFFF
 	);
 	
 	// アングル単位表示
