@@ -1,4 +1,4 @@
-/*
+８/*
   CAN bus data logger for SUBARU Levorg
 */
 
@@ -164,7 +164,7 @@ void subaruLevorgTransmission(twai_message_t* rx_frame) {
 
 void subaruLevorgSteering(twai_message_t* rx_frame) {
 
-  SteeringAngle = bytesToIntLe(rx_frame->data, 2, 2) * -0.1;
+  SteeringAngle = bytesToIntLe(rx_frame->data, 2, 2) * 0.1;
   // Serial.printf("Steering %-d\n",SteeringAngle);
 }
 
