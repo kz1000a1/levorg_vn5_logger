@@ -13,7 +13,7 @@
 #include "system.h"
 #include "error.h"
 #include "printf.h"
-#include "subaru_levorg_vnx.h"
+#include "subaru_levorg_vn5.h"
 
 
 static float EngineRPM = 0;
