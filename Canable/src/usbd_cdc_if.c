@@ -3,7 +3,6 @@
 //
 
 #include "usbd_cdc_if.h"
-#include "eliminator.h"
 #include "system.h"
 #include "error.h"
 
