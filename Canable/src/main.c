@@ -21,9 +21,7 @@ static float Speed = 0;
 static float AcceleratorPosition = 0;
 static uint8_t ShiftPosition = 0;
 static int16_t SteeringAngle = 0;
-static float BrakePercentage = 0;
-static uint8_t clutch = 0;
-static uint8_t neutral = 0;
+static float BrakePercentage = 0;;
 
 int16_t bytesToInt(uint8_t raw[], int shift, int size) {
 
@@ -189,7 +187,7 @@ int main(void)
                 case CAN_ID_BRAKE:
                     subaruLevorgBrake(rx_msg_data);
                     break;
-                case CAN_ID_ENGINE:
+                case CAN_ID_ENGINE_TEMPERATURE:
                     subaruLevorgOutputCsv();
                     break;
                     // default:
