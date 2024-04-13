@@ -10,8 +10,6 @@
 static volatile usbrx_buf_t rxbuf = {0};
 static uint8_t txbuf[TX_BUF_SIZE];
 extern USBD_HandleTypeDef hUsbDeviceFS;
-static uint8_t eliminator_str[ELIMINATOR_MTU];
-static uint8_t eliminator_str_index = 0;
 
 
 // Private function prototypes
