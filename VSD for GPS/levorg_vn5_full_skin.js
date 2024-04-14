@@ -242,7 +242,7 @@ function Draw(){
 	Vsd.DrawTextAlign(
 		SpeedMeterParam.X, SpeedMeterParam.Y - MeterR * 0.5,
 		ALIGN_HCENTER | ALIGN_TOP,
-		"km/h", FontS, 0xFFFFFF
+		"KM/H", FontS, 0xFFFFFF
 	);
 
 	//////////     タコメーター     //////////
