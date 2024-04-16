@@ -275,23 +275,25 @@ function Draw(){
 	// ブレーキメーター針
 	Vsd.DrawArc(
 		BrakeMeterParam.X, BrakeMeterParam.Y, MeterR, MeterR,
-		MeterR * 0.93, MeterR * 0.93,
-		(MeterCenter - 1) - (Log.Brake / BrakeMeterParam.MaxVal * (MeterCenter - MeterMin - 1)),
-		MeterCenter, 0xFF0000
+		MeterR * 0.93, MeterR * 0.93, MeterMin,
+		(MeterMin + 1) + (Log.Brake / BrakeMeterParam.MaxVal * (MeterCenter - MeterMin - 1)),
+		0xFF0000
 	);
 	
 	// アクセルメーター針
-	if((360 - MeterCenter - 1) <= Log.Accel / AccelMeterParam.MaxVal * (MeterCenter - MeterMin - 1)){
+	if(360 <= (MeterMax + 360 - 1) - (Log.Accel / AccelMeterParam.MaxVal * (MeterCenter - MeterMin - 1))){
 		Vsd.DrawArc(
 			AccelMeterParam.X, AccelMeterParam.Y, MeterR, MeterR,
-			MeterR * 0.93, MeterR * 0.93, MeterCenter,
-			(Log.Accel / AccelMeterParam.MaxVal * (MeterCenter - MeterMin - 1)) - (360 - MeterCenter - 1), 0x0000FF
+			MeterR * 0.93, MeterR * 0.93,
+			(MeterMax - 1) - (Log.Accel / AccelMeterParam.MaxVal * (MeterCenter - MeterMin - 1)),
+ 			MeterMax, 0x0000FF
 		);
 	} else {
 		Vsd.DrawArc(
 			AccelMeterParam.X, AccelMeterParam.Y, MeterR, MeterR,
-			MeterR * 0.93, MeterR * 0.93, MeterCenter,
-			(Log.Accel / AccelMeterParam.MaxVal * (MeterCenter - MeterMin - 1)) + MeterCenter + 1 , 0x0000FF
+			MeterR * 0.93, MeterR * 0.93,
+			(MeterMax + 360 - 1) - (Log.Accel / AccelMeterParam.MaxVal * (MeterCenter - MeterMin - 1)),
+ 			MeterMax, 0x0000FF
 		);
 	}
 	
