@@ -134,7 +134,6 @@ uint16_t bitsToUintLe(uint8_t raw[], int shift, int size) {
 bool if_can_message_receive_is_pendig() {
 
   uint32_t alerts_triggered;
-  twai_status_info_t twaistatus;
 
   // Check if alert happened
   twai_read_alerts(&alerts_triggered, pdMS_TO_TICKS(POLLING_RATE_MS));
