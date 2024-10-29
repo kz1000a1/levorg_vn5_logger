@@ -150,7 +150,7 @@ void subaruLevorgBrake(uint8_t* rx_msg_data) {
 
 void subaruLevorgOutputCsv() {
   // Serial.println("subaruLevorgOutputCsv()");
-  printf_(", %d, %d, %d, %d, %d, %-d\n", (int)Speed, (int)EngineRPM, (int)ShiftPosition, (int)AcceleratorPosition, (int)BrakePercentage, (int)(SteeringAngle * MAX_STEERING_ANGLE / STEERING_MAX));
+  printf_(", %d.%01d, %d.%01d, %d, %d.%01d, %d.%01d, %-d.%01u\n", (int)Speed, (int)(Speed * 10) % 10, (int)EngineRPM, (int)(EngineRPM * 10) % 10, (int)ShiftPosition, (int)AcceleratorPosition, (int)(AcceleratorPosition * 10) % 10, (int)BrakePercentage, (int)(BrakePercentage * 10) % 10, (int)(SteeringAngle * MAX_STEERING_ANGLE / STEERING_MAX), (int)(SteeringAngle * MAX_STEERING_ANGLE / STEERING_MAX * 10) % 10);
 }
 
 
