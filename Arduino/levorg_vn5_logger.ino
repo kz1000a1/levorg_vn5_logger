@@ -169,7 +169,7 @@ void subaruLevorgSteering(twai_message_t* rx_frame) {
 
 void subaruLevorgBrake(twai_message_t* rx_frame) {
   // Speed = bitsToUIntLe(rx_frame->data, 16, 13) * 0.015694;
-  Speed = (rx_frame->data[2] + ((rx_frame->data[3] & 0x1f) << 8)) * 0.05625;
+  Speed = (rx_frame->data[2] + ((rx_frame->data[3] & 0x1f) << 8)) * 0.015694 * 3.6;
   // BrakePressure = (3.4518689053 * bytesToInt(rxBuf, 0, 2) - 327.27) / 1000.00;
   // BrakePercentage = min(0.2 * (bytesToInt(rxBuf, 0, 2) - 102), 100);
   BrakePercentage = bytesToUint(rx_frame->data, 5, 1) / 0.7;
