@@ -6,12 +6,47 @@
 #include "driver/twai.h"
 
 // Pins used to connect to CAN bus transceiver:
-// #define RX_PIN GPIO_NUM_21
-// #define TX_PIN GPIO_NUM_20
-// #define RX_PIN GPIO_NUM_19
-// #define TX_PIN GPIO_NUM_22
-#define RX_PIN GPIO_NUM_32
-#define TX_PIN GPIO_NUM_26
+
+// ESP32 Dev Module
+#if defined(ARDUINO_ESP32_DEV)
+#define CAN_RX_PIN GPIO_NUM_26
+#define CAN_TX_PIN GPIO_NUM_25
+#endif
+
+// M5Stack Core PORT.A
+#if defined(ARDUINO_M5STACK_CORE)
+// Unit CAN Bus / Unit Mini CAN
+// https://docs.m5stack.com/en/unit/can
+// https://docs.m5stack.com/en/unit/Unit-Mini%20CAN
+#define RX_PIN GPIO_NUM_22
+#define TX_PIN GPIO_NUM_21
+#endif
+
+// M5Stack Atom CAN
+#if defined(ARDUINO_M5STACK_ATOM)
+// ATOMIC CAN Base
+// https://docs.m5stack.com/en/atom/Atomic%20CAN%20Base
+#define RX_PIN GPIO_NUM_19
+#define TX_PIN GPIO_NUM_22
+// Unit CAN Bus / Unit Mini CAN
+// https://docs.m5stack.com/en/unit/can
+// https://docs.m5stack.com/en/unit/Unit-Mini%20CAN
+// #define RX_PIN GPIO_NUM_32
+// #define TX_PIN GPIO_NUM_26
+#endif
+
+// M5Stack AtomS3 CAN
+#if defined(ARDUINO_M5STACK_ATOMS3)
+// ATOMIC CAN Base
+// https://docs.m5stack.com/en/atom/Atomic%20CAN%20Base
+#define RX_PIN GPIO_NUM_6
+#define TX_PIN GPIO_NUM_5
+// Unit CAN Bus / Unit Mini CAN
+// https://docs.m5stack.com/en/unit/can
+// https://docs.m5stack.com/en/unit/Unit-Mini%20CAN
+// #define RX_PIN GPIO_NUM_1
+// #define TX_PIN GPIO_NUM_2
+#endif
 
 #define POLLING_RATE_MS 1000
 static bool driver_installed = false;
